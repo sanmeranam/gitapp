@@ -6,7 +6,7 @@ angular.module('appCherryPick')
             $scope.source_repo = "";
             $scope.source_commit = "";
             $scope.source_branch = "";
-            $scope.source_repos = [];
+            $scope.source_repos = ["A"];
 
             $scope.target_repo = "";
             $scope.target_tag = "";
