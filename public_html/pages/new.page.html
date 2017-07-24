@@ -1,0 +1,177 @@
+<div class="wrapper wrapper-content p-xl" style="padding-top: 10px" ng-controller="addController">
+    <div class="container-fluid animated fadeInRight">
+        <div class="row">
+
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Create cherry-pick</h5>
+                        <div ibox-tools></div>
+                    </div>
+                    <div class="ibox-content no-borders">
+                        <div class="row">
+                            <div class="col-sm-2 col-sm-offset-5">                                
+                                <h1 class="no-margins">RDM-FOR-JCP</h1>           
+                                <div class="stat-percent font-bold text-success">Project</div>
+                            </div>
+                            <div class="col-sm-5">
+                                <button class="btn btn-info pull-right" ng-disabled="!(source_commit && source_branch && target_tag)"><i class="fa fa-code-fork"></i> Pull Request</button>
+                            </div>
+                        </div>
+                        <br><br>
+                        <div class="row">
+                            <div class="col-sm-6 b-r">
+                                <div class="ibox-title no-borders">
+                                    <h5>Source</h5>
+                                    <div ibox-tools>
+
+
+                                        <div uib-dropdown class="pull-right">
+                                            <button uib-popover-template="'sourceRepoTemplate.html'" popover-is-open="isSourcePopupOpen" popover-placement="bottom" popover-title="Repository" type="button" class="btn btn-white no-borders">{{source_repo?'Current Repo: '+source_repo:'Select Repository'}}</button>
+
+                                            <script type="text/ng-template" id="sourceRepoTemplate.html">
+                                                <div class="list-group" style='min-width:200px'>
+                                                <a href="#" ng-click="selectSourceRepo(r)" class="list-group-item" ng-class="r==source_repo?'active':''" ng-repeat="r in source_repos">
+                                                {{r}}
+                                                </a>
+                                                </div>
+                                            </script>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+
+                                    <div class="col-lg-12" ng-hide="source_commit" ng-click="selectSourceCommit(4)">
+                                        <div class="ibox float-e-margins">
+                                            <div class="ibox-content">
+                                                <div class="row">
+                                                    <div class="col-sm-8">
+                                                        <ul uib-pagination direction-links="false" boundary-links="true" total-items="totalItems" ng-model="currentPage"></ul>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="input-group"><input type="text" placeholder="Search" class="input-sm form-control"> 
+                                                            <span class="input-group-btn">
+                                                                <button type="button" class="btn btn-sm btn-primary"><i class="fa fa-search"></i></button> 
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+
+                                                                <th>#</th>
+                                                                <th>Commit ID </th>
+                                                                <th>Commit by </th>
+                                                                <th>Descriptions </th>
+                                                                <th>Status </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>1</td>
+                                                                <td><a href="#">232k3j23k23j2k323k2</a></td>
+                                                                <td>Patrick Smith</td>
+                                                                <td>Project <small>This is example of project</small></td>
+                                                                <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ibox float-e-margins" ng-show="source_commit">
+                                        <div class="ibox-title">
+                                            <h5>Commit ID# {{source_commit}}</h5>
+                                            <div class="ibox-tools">
+                                                <button title="Cancel" class="btn btn-xs btn-white no-borders" ng-click="deselectSourceCommit()"><i class="fa fa-times"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="ibox-content">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    dd
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="ibox-title no-borders">
+                                    <h5>Target</h5>
+                                    <div ibox-tools>
+                                        <div uib-dropdown class="pull-right">
+                                            <button uib-popover-template="'targetRepoTemplate.html'" popover-is-open="isTargetPopupOpen" popover-placement="bottom" popover-title="Repository" type="button" class="btn btn-white no-borders">{{target_repo?'Current Repo: '+target_repo:'Select Repository'}}</button>
+
+                                            <script type="text/ng-template" id="targetRepoTemplate.html">
+                                                <div class="list-group" style='min-width:200px'>
+                                                <a href="#" ng-click="selectTargetRepo(r)" class="list-group-item" ng-class="r==target_repo?'active':''" ng-repeat="r in target_repos">
+                                                {{r}}
+                                                </a>
+                                                </div>
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-lg-12" >
+                                        <div class="ibox float-e-margins">
+                                            <div class="ibox-content">
+                                                <div class="row">
+                                                    <div class="col-sm-7">
+                                                        <ul uib-pagination direction-links="false" boundary-links="true" total-items="totalItems" ng-model="currentPage"></ul>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="input-group">
+                                                            <input type="text" placeholder="Search" class="input-sm form-control"> 
+                                                            <span class="input-group-btn"><button type="button" class="btn btn-sm btn-primary"><i class="fa fa-search"></i></button></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+
+                                                                <th>#</th>
+                                                                <th>Tag ID </th>
+                                                                <th>Tag Name</th>
+                                                                <th>Descriptions </th>
+                                                                <th>Status </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>1</td>
+                                                                <td><a href="#">232k3j23k23j2k323k2</a></td>
+                                                                <td>Patrick Smith</td>
+                                                                <td>Project <small>This is example of project</small></td>
+                                                                <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
