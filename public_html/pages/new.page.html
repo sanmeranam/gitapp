@@ -11,7 +11,7 @@
                     <div class="ibox-content no-borders">
                         <div class="row">
                             <div class="col-sm-2 col-sm-offset-5">                                
-                                <h1 class="no-margins">RDM-FOR-JCP</h1>           
+                                <h1 class="no-margins">{{project_name}}</h1>           
                                 <div class="stat-percent font-bold text-success">Project</div>
                             </div>
                             <div class="col-sm-5">
@@ -22,14 +22,15 @@
                         <div class="row">
                             <div class="col-sm-6 b-r">
                                 <div class="ibox-title no-borders">
-                                    <h5>Source</h5>
+                                    <h5>Source</h5>                                    
                                     <div ibox-tools>
 
 
                                         <div uib-dropdown class="pull-right">
-                                            <button uib-popover-template="'sourceRepoTemplate.html'" popover-is-open="isSourcePopupOpen" popover-placement="bottom" popover-title="Repository" type="button" class="btn btn-white no-borders">{{source_repo?'Current Repo: '+source_repo:'Select Repository'}}</button>
+                                            <button uib-popover-template="'sourceRepoTemplate.html'" popover-is-open="isSourcePopupOpen" popover-placement="bottom" popover-title="Repository" type="button" class="btn btn-white no-borders">{{source_repo?'Selected Repo: '+source_repo:'Select Repository'}}</button>
 
                                             <script type="text/ng-template" id="sourceRepoTemplate.html">
+                                                <center ng-show="load_repos_status"><i  class="fa fa-spinner fa-spin"></i></center>
                                                 <div class="list-group" style='min-width:200px'>
                                                 <a href="#" ng-click="selectSourceRepo(r)" class="list-group-item" ng-class="r==source_repo?'active':''" ng-repeat="r in source_repos">
                                                 {{r}}
@@ -42,9 +43,10 @@
                                 </div>
 
 
-                                <div class="row">
+                                <div class="row" ng-show="source_repo">
 
                                     <div class="col-lg-12" ng-hide="source_commit" ng-click="selectSourceCommit(4)">
+                                        <center ng-show="load_commits_status"><i  class="fa fa-spinner fa-spin"></i></center>
                                         <div class="ibox float-e-margins">
                                             <div class="ibox-content">
                                                 <div class="row">
@@ -95,6 +97,7 @@
                                             </div>
                                         </div>
                                         <div class="ibox-content">
+                                            <center ng-show="load_commit_info_status || load_commit_branch_status"><i  class="fa fa-spinner fa-spin"></i></center>
                                             <div class="row">
                                                 <div class="col-sm-12">
                                                     dd
@@ -109,9 +112,10 @@
                                     <h5>Target</h5>
                                     <div ibox-tools>
                                         <div uib-dropdown class="pull-right">
-                                            <button uib-popover-template="'targetRepoTemplate.html'" popover-is-open="isTargetPopupOpen" popover-placement="bottom" popover-title="Repository" type="button" class="btn btn-white no-borders">{{target_repo?'Current Repo: '+target_repo:'Select Repository'}}</button>
+                                            <button uib-popover-template="'targetRepoTemplate.html'" popover-is-open="isTargetPopupOpen" popover-placement="bottom" popover-title="Repository" type="button" class="btn btn-white no-borders">{{target_repo?'Selected Repo: '+target_repo:'Select Repository'}}</button>
 
                                             <script type="text/ng-template" id="targetRepoTemplate.html">
+                                                <center ng-show="load_repos_status"><i  class="fa fa-spinner fa-spin"></i></center>
                                                 <div class="list-group" style='min-width:200px'>
                                                 <a href="#" ng-click="selectTargetRepo(r)" class="list-group-item" ng-class="r==target_repo?'active':''" ng-repeat="r in target_repos">
                                                 {{r}}
@@ -121,11 +125,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row" ng-show="target_repo">
 
-                                    <div class="col-lg-12" >
+                                    <div class="col-lg-12" ng-hide="target_tag">
                                         <div class="ibox float-e-margins">
                                             <div class="ibox-content">
+                                                <center ng-show="load_tags_status"><i  class="fa fa-spinner fa-spin"></i></center>
                                                 <div class="row">
                                                     <div class="col-sm-7">
                                                         <ul uib-pagination direction-links="false" boundary-links="true" total-items="totalItems" ng-model="currentPage"></ul>
@@ -152,7 +157,7 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td>1</td>
-                                                                <td><a href="#">232k3j23k23j2k323k2</a></td>
+                                                                <td><a ng-click="selectTargetTag(4)" href="#">232k3j23k23j2k323k2</a></td>
                                                                 <td>Patrick Smith</td>
                                                                 <td>Project <small>This is example of project</small></td>
                                                                 <td><a href="#"><i class="fa fa-check text-navy"></i></a></td>
@@ -164,7 +169,22 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                    
+                                    <div class="ibox float-e-margins" ng-show="target_tag">
+                                        <div class="ibox-title">
+                                            <h5>Tag# {{target_tag}}</h5>
+                                            <div class="ibox-tools">
+                                                <button title="Cancel" class="btn btn-xs btn-white no-borders" ng-click="deselectTargetTag()"><i class="fa fa-times"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="ibox-content">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    dd
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                 </div>
                             </div>
