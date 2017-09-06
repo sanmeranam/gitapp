@@ -1,2 +1,217 @@
-test1 new file change
-page 2
+var spawn = require('threads').spawn;
+
+var fnBaseCreate = function () {
+    return function (input, done) {
+
+        var nodegit = require("nodegit");
+        nodegit.enableThreadSafety();
+        try {
+            var basePath = input.dir + input.id;
+
+            var repo, branchRepo, CommitId, remote, index, author;
+
+            done({
+                type: "MSG",
+                input: input,
+                body: "Repository clone initialized.",
+                time: Date.now()
+            });
+
+            nodegit.Clone(input.url, basePath, {
+                fetchOpts: {
+                    callbacks: {
+                        certificateCheck: function () {
+                            return 1;
+                        },
+                        credentials: function (url, userName) {
+                            return nodegit.Cred.userpassPlaintextNew(input.user, input.pwd);
+                        }
+                    }
+                },
+                checkout_branch: input.branch
+            }).then(function (repoResult) {
+                repo = repoResult;
+
+                done({
+                    type: "MSG",
+                    input: input,
+                    body: "Repository clone complete.",
+                    time: Date.now()
+                });
+
+                return nodegit.Branch.lookup(repoResult, "origin/" + input.branch, 2);
+            }).then(function (repoResult) {
+                branchRepo = repoResult;
+                return repo.getCommit(input.commit);
+            }).then(function (CommitRef) {
+                return nodegit.Cherrypick.cherrypick(repo, CommitRef, {mainline: 0});
+            }).then(function () {
+                done({
+                    type: "MSG",
+                    input: input,
+                    body: "Cherry Pick created.",
+                    time: Date.now()
+                });
+
+                return repo.getStatus();
+            }).then(function (result) {
+                if (result.length) {
+                    done({
+                        type: "MSG",
+                        input: input,
+                        body: "Changes applied to branch.",
+                        time: Date.now()
+                    });
+
+                    return repo.refreshIndex();
+                } else {
+                    done({
+                        type: "FINISH",
+                        input: input,
+                        body: "Not found any changes or got some error.",
+                        time: Date.now()
+                    });
+                }
+            }).then(function (indexResult) {
+                index = indexResult;
+            }).then(function () {
+                return index.addAll(basePath);
+            }).then(function () {
+                return index.write();
+            }).then(function () {
+                return index.writeTree();
+            }).then(function (oidResult) {
+                oid = oidResult;
+                return nodegit.Reference.nameToId(repo, "HEAD");
+            }).then(function (head) {
+                return repo.getCommit(head);
+            }).then(function (parent) {
+                author = repo.defaultSignature();
+                return repo.createCommit("HEAD", author, author, "Cherry-pick commit from " + input.commit, oid, [parent]);
+            }).then(function (commitId) {
+                CommitId = commitId;
+
+                done({
+                    type: "MSG",
+                    input: input,
+                    body: "Commit applied,id:" + commitId,
+                    time: Date.now()
+                });
+
+                return repo.getRemote('origin');
+            }).then(function (remoteResult) {
+
+                remote = remoteResult;
+
+                done({
+                    type: "MSG",
+                    input: input,
+                    body: "Push to remote, initialized",
+                    time: Date.now()
+                });
+
+                return remote.connect(nodegit.Enums.DIRECTION.PUSH, {
+                    credentials: function (url, userName) {
+                        nodegit.Cred.userpassPlaintextNew(input.user, input.pwd);
+                    }
+                });
+            }).then(function () {
+                return remote.push(
+                        ["refs/heads/master:refs/heads/master"],
+                        null,
+                        repo.defaultSignature(),
+                        "Push to master test");
+            }).then(function (result) {
+                done({
+                    type: "FINISH",
+                    input: input,
+                    body: "Push complete.",
+                    result: result,
+                    time: Date.now()
+                });
+            }).catch(function (error) {
+                done({
+                    type: "ERROR",
+                    input: input,
+                    body: error,
+                    time: Date.now()
+                });
+            });
+
+        } catch (e) {
+            done({
+                type: "ERROR",
+                input: input,
+                body: e,
+                time: Date.now()
+            });
+        }
+    };
+};
+
+
+
+
+module.exports = git_service = {
+    _threads: {},
+    create: function (userName, password, url, sTargetBranch, sCommitId) {
+
+        var newId = sCommitId;//this._getId();
+
+        if (this.check(newId)) {
+            return newId;
+        }
+
+        var thread = spawn(fnBaseCreate());
+        thread.send({
+            dir: __dirname + "/_repos/",
+            url: url,
+            id: newId,
+            user: userName,
+            pwd: password,
+            branch: sTargetBranch,
+            commit: sCommitId
+        }).on("error", this._onerror.bind(this))
+                .on("exit", this._onexit.bind(this))
+                .on("message", this._onmessage.bind(this));
+
+
+        var newStatus = {type: "NEW", body: "Thread created for process.", id: newId, time: Date.now()};
+
+        this._threads[newId] = {
+            inst: thread,
+            status: newStatus,
+            data: {}
+        };
+        return newStatus;
+    },
+    check: function (sId) {
+        if (this._threads[sId]) {
+            return this._threads[sId].status;
+        }
+        return null;
+    },
+    _getId: function () {
+        return Date.now();
+    },
+    _onerror: function (error) {
+
+    },
+    _onmessage: function (response) {
+        this._threads[response.input.id].status = response;
+
+        switch (response.type) {
+            case "ERROR":
+                this._threads[response.input.id].inst.kill();
+                break;
+            case "MSG":
+                break;
+            case "FINISH":
+                this._threads[response.input.id].inst.kill();
+                break;
+        }
+    },
+    _onexit: function () {
+
+    }
+};
