@@ -1,0 +1,25 @@
+var exec = require('child-process-promise').exec;
+
+
+module.exports = _this = {
+    init: function (basePath) {
+        _this.basePath = basePath;
+    },
+    clone: function (url) {
+        _this.baseURL = url;
+        return exec("git clone " + url + " " + _this.basePath);
+    },
+    checkout: function (branch) {
+        _this.baseBranch = branch;
+        return exec("cd " + _this.basePath + " & git checkout " + branch);
+    },
+    cherrypick: function (commitId) {
+        return exec("cd " + _this.basePath + " & git cherry-pick " + commitId);
+    },
+    addAll: function () {
+        return exec("cd " + _this.basePath + " & git add -A");
+    },
+    push: function () {
+        return exec("cd " + _this.basePath + " & git push origin " + _this.baseBranch);
+    }
+};
