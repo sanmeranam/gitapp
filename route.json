@@ -1,18 +1,21 @@
 {
-                    "index": {
-                        "abstract": true,
-                        "url": "/index",
-                        "templateUrl": "app/components/common/content.html"
-                    },
-                    "index.main": {
-                        "url": "/main",
-                        "templateUrl": "app/main/main.html",
-                        "data": { "pageTitle": "Example view" }
-                    },
-                    "index.minor": {
-                        "url": "/minor",
-                        "templateUrl": "app/minor/minor.html",
-                        "data": { "pageTitle": "Example view" }
-                    }
-                }
-            
+   "index":{
+      "abstract":true,
+      "url":"/index",
+      "templateUrl":"app/components/common/content.html"
+   },
+   "index.main":{
+      "url":"/main",
+      "templateUrl":"app/main/main.html",
+      "data":{
+         "pageTitle":"Example view"
+      }
+   },
+   "index.minor":{
+      "url":"/minor",
+      "templateUrl":"app/minor/minor.html",
+      "data":{
+         "pageTitle":"Example view"
+      }
+   }
+}
